@@ -18,14 +18,15 @@ namespace xendfinance_dotnet_sdk
         private readonly Web3 _polygonWeb3;
         private Account _bscAccount;
         private Account _polygonAccount;
-       
-        public Web3Client(string privateKey, BigInteger bscChainId, BigInteger polygonChainId, string bscNodeUrl, string polygonNodeUrl)
-        {          
+        private GasPriceLevel _gasPriceLevel;
+
+        public Web3Client(string privateKey, BigInteger bscChainId, BigInteger polygonChainId, string bscNodeUrl, string polygonNodeUrl, GasPriceLevel gasPriceLevel)
+        {
             _bscAccount = new Account(privateKey, bscChainId);
             _polygonAccount = new Account(privateKey, polygonChainId);
             _bscWeb3 = new Web3(_bscAccount, bscNodeUrl);
             _polygonWeb3 = new Web3(_polygonAccount, polygonNodeUrl);
-
+            _gasPriceLevel = gasPriceLevel;
         }
 
         public async Task<IEnumerable<EventLog<TEventMessage>>> GetEvents<TEventMessage>(Networks network, string contractAddress, ulong startBlock, ulong endBlock) where TEventMessage : IEventDTO, new()
@@ -54,6 +55,16 @@ namespace xendfinance_dotnet_sdk
             BlockWithTransactions blockWithTransactions = await web3.Eth.Blocks.GetBlockWithTransactionsByNumber.SendRequestAsync(blockParameter);
             ulong blockTimeStamp = ulong.Parse(blockWithTransactions.Timestamp.Value.ToString());
             return blockTimeStamp;
+        }
+
+        public async Task<string> SendTransactionAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, params object[] functionInput)
+        {           
+            Contract contract = GetContract(network, contractAddress, abi);
+            Account account = GetAccountInstance(network);
+            var function = contract.GetFunction(functionName);
+            var gas =await function.EstimateGasAsync(functionInput);
+            string transactionHash = await function.SendTransactionAsync(account.Address, gas, null, null, functionInput);
+            return transactionHash;
         }
 
         public async Task<T> CallContract<T>(Networks network, string contractAddress, string abi, string functionName, params object[] functionInput) where T : IFunctionOutputDTO, new()
@@ -85,6 +96,19 @@ namespace xendfinance_dotnet_sdk
             Web3 web3 = GetWeb3Instance(network);
             Contract contract = web3.Eth.GetContract(abi, contractAddress);
             return contract;
+        }
+
+        private Account GetAccountInstance(Networks network)
+        {
+            switch (network)
+            {
+                case Networks.BSC:
+                    return _bscAccount;
+                case Networks.POLYGON:
+                    return _polygonAccount;
+                default:
+                    throw new ArgumentOutOfRangeException("Unsupported Network Chain");
+            }
         }
 
         private Web3 GetWeb3Instance(Networks network)

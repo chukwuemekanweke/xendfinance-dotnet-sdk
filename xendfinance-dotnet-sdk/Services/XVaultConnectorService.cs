@@ -12,7 +12,7 @@ namespace xendfinance_dotnet_sdk.Services
     internal class XVaultConnectorService : IXVaultConnectorService
     {
 
-        private readonly string ContractABI;
+        private string ContractABI;
 
         public Task<string> DepositAndWaitForReceiptAsync(decimal amount, Assets asset, Networks network = Networks.BSC)
         {
@@ -89,7 +89,7 @@ namespace xendfinance_dotnet_sdk.Services
                 return ContractABI;
             }
 
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "ABI", "xVault.json");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "ABIs", "xVault.json");
             using (StreamReader r = new StreamReader(path))
             {
                 string contractABI = r.ReadToEnd();
