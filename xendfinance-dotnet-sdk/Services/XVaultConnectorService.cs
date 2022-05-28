@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using xendfinance_dotnet_sdk.Interfaces;
@@ -12,11 +13,22 @@ namespace xendfinance_dotnet_sdk.Services
     internal class XVaultConnectorService : IXVaultConnectorService
     {
 
-        private string ContractABI;
+        private string XVaultContractABI;
+        private string ERC20ContractABI;
+        private readonly IWeb3Client _web3Client;
 
-        public Task<string> DepositAndWaitForReceiptAsync(decimal amount, Assets asset, Networks network = Networks.BSC)
+        public XVaultConnectorService(IWeb3Client web3Client)
         {
+            _web3Client = web3Client;
+        }
+
+        public Task<string> DepositAndWaitForReceiptAsync(decimal amount, Assets asset, Networks network = Networks.BSC, GasPriceLevel? gasPriceLevel, CancellationToken cancellationToken)
+        {
+            ReadContractABIs();
             string tokenContractAddress = GetAssetContractAddress(asset, network);
+            string protocolContractAddress = GetProtocolContractAddress(asset, network);
+            BigInteger amountInBase = ConvertAmountToBaseUnit(amount);
+            TransactionResponse transactionResponse = _web3Client.SendTransactionAndWaitForReceiptAsync(network, tokenContractAddress, ERC20ContractABI, FunctionNames.Approve, gasPriceLevel, cancellationToken, protocolContractAddress, amountInBase);
 
             throw new NotImplementedException();
         }
@@ -82,20 +94,77 @@ namespace xendfinance_dotnet_sdk.Services
             throw new NotImplementedException();
         }
 
-        private string ReadContractAbi()
+        private BigInteger ConvertAmountToBaseUnit(decimal amount)
         {
-            if(!string.IsNullOrWhiteSpace(ContractABI))
+            throw new NotImplementedException();
+
+        }
+
+        private void ReadContractABIs()
+        {
+            ReadProtocolContractAbi();
+            ReadERC20ContractAbi();
+        }
+
+        private string ReadProtocolContractAbi()
+        {
+            if(!string.IsNullOrWhiteSpace(XVaultContractABI))
             {
-                return ContractABI;
+                return XVaultContractABI;
             }
 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "ABIs", "xVault.json");
             using (StreamReader r = new StreamReader(path))
             {
                 string contractABI = r.ReadToEnd();
-                ContractABI = contractABI;
+                XVaultContractABI = contractABI;
                 return contractABI;
             }
+        }
+
+        private string ReadERC20ContractAbi()
+        {
+            if (!string.IsNullOrWhiteSpace(ERC20ContractABI))
+            {
+                return ERC20ContractABI;
+            }
+
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "ABIs", "erc20.json");
+            using (StreamReader r = new StreamReader(path))
+            {
+                string contractABI = r.ReadToEnd();
+                ERC20ContractABI = contractABI;
+                return contractABI;
+            }
+        }
+
+        private string GetProtocolContractAddress(Assets asset, Networks network)
+        {
+            string contractAddress;
+            switch (network)
+            {
+                case Networks.BSC:
+                    switch (asset)
+                    {
+                        case Assets.BUSD:
+                            contractAddress = ProtocolContractAddresses.BUSD_VAULT_BSC_CONTRACT_ADDRESS;
+                            break;
+                        case Assets.USDC:
+                            contractAddress = ProtocolContractAddresses.USDC_VAULT_BSC_CONTRACT_ADDRESS;
+                            break;
+                        case Assets.USDT:
+                            contractAddress = ProtocolContractAddresses.USDT_VAULT_BSC_CONTRACT_ADDRESS;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException("Asset not supported on network for xVault");
+                    }
+                    break;
+                case Networks.POLYGON:
+                default:
+                    throw new ArgumentOutOfRangeException("Network not supported for xVault");
+
+            }
+            return contractAddress;
         }
 
 

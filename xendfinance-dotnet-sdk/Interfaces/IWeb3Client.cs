@@ -1,6 +1,7 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using Nethereum.Contracts;
 using xendfinance_dotnet_sdk.Models.Enums;
+using xendfinance_dotnet_sdk.Models.ServiceModels;
 
 namespace xendfinance_dotnet_sdk.Interfaces
 {
@@ -12,5 +13,7 @@ namespace xendfinance_dotnet_sdk.Interfaces
         Task<T> CallContract<T>(Networks network, string contractAddress, string abi, string functionName, params object[] functionInput) where T : IFunctionOutputDTO, new();
         Task<T> CallContract<T>(Networks network, string contractAddress, string abi, string functionName, string from, params object[] functionInput) where T : IFunctionOutputDTO, new();
         Task<T> CallContract<T, W>(Networks network, string contractAddress, W inputFunction) where W : FunctionMessage, new() where T : class, new();
+        Task<string> SendTransactionAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, params object[] functionInput);
+        Task<TransactionResponse> SendTransactionAndWaitForReceiptAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, CancellationToken cancellationToken, params object[] functionInput);
     }
 }

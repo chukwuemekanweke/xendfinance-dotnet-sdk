@@ -93,7 +93,7 @@ namespace xendfinance_dotnet_sdk.Services
             gasEstimates[network] = response;
         }
 
-        private GasEstimateResponse GetFromInMemory(Networks network)
+        private GasEstimateResponse? GetFromInMemory(Networks network)
         {
             if (!gasEstimates.ContainsKey(network))
             {

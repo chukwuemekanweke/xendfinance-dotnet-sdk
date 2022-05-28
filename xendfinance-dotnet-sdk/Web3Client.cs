@@ -8,6 +8,7 @@ using Nethereum.Web3.Accounts;
 using System.Numerics;
 using xendfinance_dotnet_sdk.Interfaces;
 using xendfinance_dotnet_sdk.Models.Enums;
+using xendfinance_dotnet_sdk.Models.ServiceModels;
 using xendfinance_dotnet_sdk.Utilities;
 
 namespace xendfinance_dotnet_sdk
@@ -19,15 +20,19 @@ namespace xendfinance_dotnet_sdk
         private Account _bscAccount;
         private Account _polygonAccount;
         private GasPriceLevel _gasPriceLevel;
+        private IGasEstimatorService _gasEstimatorService;
 
-        public Web3Client(string privateKey, BigInteger bscChainId, BigInteger polygonChainId, string bscNodeUrl, string polygonNodeUrl, GasPriceLevel gasPriceLevel)
+        public Web3Client(string privateKey, BigInteger bscChainId, BigInteger polygonChainId, string bscNodeUrl, string polygonNodeUrl, GasPriceLevel gasPriceLevel, IGasEstimatorService gasEstimatorService)
         {
             _bscAccount = new Account(privateKey, bscChainId);
             _polygonAccount = new Account(privateKey, polygonChainId);
             _bscWeb3 = new Web3(_bscAccount, bscNodeUrl);
             _polygonWeb3 = new Web3(_polygonAccount, polygonNodeUrl);
             _gasPriceLevel = gasPriceLevel;
+            _gasEstimatorService = gasEstimatorService;
         }
+
+      
 
         public async Task<IEnumerable<EventLog<TEventMessage>>> GetEvents<TEventMessage>(Networks network, string contractAddress, ulong startBlock, ulong endBlock) where TEventMessage : IEventDTO, new()
         {
@@ -58,13 +63,31 @@ namespace xendfinance_dotnet_sdk
         }
 
         public async Task<string> SendTransactionAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, params object[] functionInput)
-        {           
+        {
             Contract contract = GetContract(network, contractAddress, abi);
             Account account = GetAccountInstance(network);
             var function = contract.GetFunction(functionName);
-            var gas =await function.EstimateGasAsync(functionInput);
-            string transactionHash = await function.SendTransactionAsync(account.Address, gas, null, null, functionInput);
+            var gas = await function.EstimateGasAsync(functionInput);
+            HexBigInteger gasPrice = await GetGasPrice(network, gasPriceLevel);
+            string transactionHash = await function.SendTransactionAsync(account.Address, gas, gasPrice, null, functionInput);
             return transactionHash;
+        }
+
+        public async Task<TransactionResponse> SendTransactionAndWaitForReceiptAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, CancellationToken cancellationToken, params object[] functionInput)
+        {
+            Contract contract = GetContract(network, contractAddress, abi);
+            Account account = GetAccountInstance(network);
+            var function = contract.GetFunction(functionName);
+            var gas = await function.EstimateGasAsync(functionInput);
+            HexBigInteger gasPrice = await GetGasPrice(network, gasPriceLevel);
+            TransactionReceipt txReceipt = await function.SendTransactionAndWaitForReceiptAsync(account.Address, gas, gasPrice, null, cancellationToken, functionInput);
+            bool isSuccessful = txReceipt.Status == new HexBigInteger(1);
+            return new TransactionResponse
+            {
+                IsSuccessful = isSuccessful,
+                TransactionHash = txReceipt.TransactionHash,
+                BlockHash = txReceipt.BlockHash
+            };
         }
 
         public async Task<T> CallContract<T>(Networks network, string contractAddress, string abi, string functionName, params object[] functionInput) where T : IFunctionOutputDTO, new()
@@ -88,6 +111,27 @@ namespace xendfinance_dotnet_sdk
             Web3 web3 = GetWeb3Instance(network);
             ContractHandler contractHandler = web3.Eth.GetContractHandler(contractAddress);
             return await contractHandler.QueryAsync<W, T>(inputFunction);
+        }
+
+        private async Task<HexBigInteger> GetGasPrice(Networks network, GasPriceLevel? gasPriceLevel)
+        {
+            GasEstimateResponse gasEstimateResponse = await _gasEstimatorService.EstimateGas(network);
+            if (!gasPriceLevel.HasValue)
+            {
+                gasPriceLevel = _gasPriceLevel;
+            }
+
+            switch (gasPriceLevel.Value)
+            {
+                case GasPriceLevel.Slow:
+                    return new HexBigInteger(new BigInteger( gasEstimateResponse.LowGas));
+                case GasPriceLevel.Average:
+                    return new HexBigInteger(new BigInteger(gasEstimateResponse.AverageGas));
+                case GasPriceLevel.Fast:
+                    return new HexBigInteger(new BigInteger(gasEstimateResponse.FastGas));
+                default:
+                    throw new ArgumentOutOfRangeException("Unsupported Gas Price Level");
+            }
         }
 
         private Contract GetContract(Networks network, string contractAddress, string abi)
