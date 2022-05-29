@@ -1,11 +1,13 @@
 ﻿using Nethereum.Web3;
 using System.Numerics;
 using xendfinance_dotnet_sdk.Functions;
+using xendfinance_dotnet_sdk.Functions.XVault;
 using xendfinance_dotnet_sdk.Interfaces;
 using xendfinance_dotnet_sdk.Models.Enums;
 using xendfinance_dotnet_sdk.Models.Exceptions;
 using xendfinance_dotnet_sdk.Models.ServiceModels;
-using xendfinance_dotnet_sdk.OutputDTOs;
+using xendfinance_dotnet_sdk.OutputDTOs.Shared;
+using xendfinance_dotnet_sdk.OutputDTOs.XVault;
 using xendfinance_dotnet_sdk.Utilities;
 
 namespace xendfinance_dotnet_sdk.Services
