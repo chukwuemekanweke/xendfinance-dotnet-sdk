@@ -4,11 +4,11 @@ using System.Numerics;
 namespace xendfinance_dotnet_sdk.OutputDTOs
 {
     [FunctionOutput]
-    public class ShareBalanceOutputDTOBase : IFunctionOutputDTO
+    public class BalanceOfOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("uint256", "", 1)]
         public virtual BigInteger Balance { get; set; }
     }
 
-    public partial class ShareBalanceOutputDTO : ShareBalanceOutputDTOBase { }
+    public partial class BalanceOfOutputDTO : BalanceOfOutputDTOBase { }
 }

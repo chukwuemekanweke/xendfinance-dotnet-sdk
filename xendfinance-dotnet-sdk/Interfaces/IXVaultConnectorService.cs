@@ -1,16 +1,19 @@
 ﻿using xendfinance_dotnet_sdk.Models.Enums;
+using xendfinance_dotnet_sdk.Models.ServiceModels;
 
 namespace xendfinance_dotnet_sdk.Interfaces
 {
     internal interface IXVaultConnectorService
     {
-        Task<string> DepositAsync(decimal amount, Assets asset, Networks network=Networks.BSC);
-        Task<string> DepositAndWaitForReceiptAsync(decimal amount, Assets asset, Networks network = Networks.BSC);
-        Task<string> WithdrawBySharesAsync(decimal shares, Assets asset, Networks network = Networks.BSC);
-        Task<string> WithdrawBySharesAndWaitForReceiptAsync(decimal shares, Assets asset, Networks network = Networks.BSC);
-        Task WithdrawAsync(decimal amount, Assets asset, Networks network = Networks.BSC);
-        Task WithdrawAndWaitForReceiptAsync(decimal amount, Assets asset, Networks network = Networks.BSC);
-        Task<decimal> ShareBalanceAsync(string address, Assets asset, Networks network = Networks.BSC);
+        Task<string> DepositAsync(decimal amount,  GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC, CancellationToken cancellationToken = default(CancellationToken));
+        Task<TransactionResponse> DepositAndWaitForReceiptAsync(decimal amount, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC, CancellationToken cancellationToken = default(CancellationToken));
+        Task<string> WithdrawBySharesAsync(decimal shares, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC);
+        Task<TransactionResponse> WithdrawBySharesAndWaitForReceiptAsync(decimal shares, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC, CancellationToken cancellationToken = default(CancellationToken));
+        Task<string> WithdrawAsync(decimal amount, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC);
+        Task<TransactionResponse> WithdrawAndWaitForReceiptAsync(decimal amount, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC, CancellationToken cancellationToken = default(CancellationToken));
+        Task<decimal> GetShareBalanceAsync(string address, Assets asset, Networks network = Networks.BSC);
+        Task<decimal> GetWorthOfSharesAsync(string address, Assets asset, Networks network = Networks.BSC);
+        Task<decimal> GetTotalAssetsAsync (Assets asset, Networks network = Networks.BSC);
         Task<decimal> MaxAvailableSharesAsync(Assets asset, Networks network = Networks.BSC);
         Task<decimal> GetCreditAvailableAsync(string strategyAddress, Assets asset, Networks network = Networks.BSC);
         Task<decimal> GetDebtOutstandingAsync(string strategyAddress, Assets asset, Networks network = Networks.BSC);
