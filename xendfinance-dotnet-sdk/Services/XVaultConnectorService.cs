@@ -194,7 +194,7 @@ namespace xendfinance_dotnet_sdk.Services
             if (!remainder.Equals(0))
             {
                 decimal remainderValue = decimal.Parse(remainder.ToString());
-                decimal fractionalPart = remainderValue / dp;
+                decimal fractionalPart = remainderValue / divisorValue;
                 decimal quotientValue = int.Parse(quotient.ToString());
                 result = quotientValue + fractionalPart;
             }
