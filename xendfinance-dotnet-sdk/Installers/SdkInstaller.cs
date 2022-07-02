@@ -1,9 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using xendfinance_dotnet_sdk.Interfaces;
 using xendfinance_dotnet_sdk.Models.Enums;
 using xendfinance_dotnet_sdk.Services;
@@ -18,29 +13,14 @@ namespace xendfinance_dotnet_sdk.Installers
                                              GasPriceLevel gasPriceLevel = GasPriceLevel.Average)
         {
             RegisterServices(services, GasEstimateUrls.BSCGasEstimateUrl, GasEstimateUrls.PolygonGasEstimateUrl);
-            services.AddSingleton<IWeb3Client>(x => new Web3Client(privateKey, ChainIds.BSCMainnet, ChainIds.PolygonMainnet, RPCNodeUrls.BSC_MAINNET, RPCNodeUrls.POLYGON_MAINNET, gasPriceLevel));
-        }
-
-        public static void AddXendFinanceSdk(this IServiceCollection services,
-                                             string privateKey,
-                                             GasPriceLevel gasPriceLevel = GasPriceLevel.Average,
-                                             BlockchainEnvironment environment = BlockchainEnvironment.Mainnet)
-        {
-            RegisterServices(services, GasEstimateUrls.BSCGasEstimateUrl, GasEstimateUrls.PolygonGasEstimateUrl);
-            switch (environment)
+            services.AddSingleton<IWeb3Client>(x => 
             {
-                case BlockchainEnvironment.Mainnet:
-                    services.AddSingleton<IWeb3Client>(x => new Web3Client(privateKey, ChainIds.BSCMainnet, ChainIds.PolygonMainnet, RPCNodeUrls.BSC_MAINNET, RPCNodeUrls.POLYGON_MAINNET, gasPriceLevel));
-                    break;
-                case BlockchainEnvironment.Testnet:
-                    services.AddSingleton<IWeb3Client>(x => new Web3Client(privateKey, ChainIds.BSCTestnet, ChainIds.PolygonTestnet, RPCNodeUrls.BSC_TESTNET, RPCNodeUrls.POLYGON_TESTNET, gasPriceLevel));
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("Found unsupported blochchain environment");
-            }
+                IGasEstimatorService gasEstimatorService = x.GetRequiredService<IGasEstimatorService>();
+                return new Web3Client(privateKey, ChainIds.BSCMainnet, ChainIds.PolygonMainnet, RPCNodeUrls.BSC_MAINNET, RPCNodeUrls.POLYGON_MAINNET, gasPriceLevel, gasEstimatorService);
+            });
         }
 
-
+       
         public static void AddXendFinanceSdk(this IServiceCollection services,
                                             string privateKey,
                                             string? bscNodeUrl =null,
@@ -50,14 +30,32 @@ namespace xendfinance_dotnet_sdk.Installers
                                             GasPriceLevel gasPriceLevel = GasPriceLevel.Average,
                                             BlockchainEnvironment environment = BlockchainEnvironment.Mainnet)
         {
+            if(string.IsNullOrWhiteSpace(bscGasEstimateUrl))
+            {
+                bscGasEstimateUrl = GasEstimateUrls.BSCGasEstimateUrl;
+            }
+
+            if (string.IsNullOrWhiteSpace(polygonGasEstimateUrl))
+            {
+                polygonGasEstimateUrl = GasEstimateUrls.PolygonGasEstimateUrl;
+            }
+
             RegisterServices(services, bscGasEstimateUrl,polygonGasEstimateUrl);         
             switch (environment)
             {
                 case BlockchainEnvironment.Mainnet:
-                    services.AddSingleton<IWeb3Client>(x => new Web3Client(privateKey, ChainIds.BSCMainnet, ChainIds.PolygonMainnet, bscNodeUrl ?? RPCNodeUrls.BSC_MAINNET, polygonNodeUrl ?? RPCNodeUrls.POLYGON_MAINNET, gasPriceLevel));
+                    services.AddSingleton<IWeb3Client>(x => 
+                    {
+                        IGasEstimatorService gasEstimatorService = x.GetRequiredService<IGasEstimatorService>();
+                        return new Web3Client(privateKey, ChainIds.BSCMainnet, ChainIds.PolygonMainnet, bscNodeUrl ?? RPCNodeUrls.BSC_MAINNET, polygonNodeUrl ?? RPCNodeUrls.POLYGON_MAINNET, gasPriceLevel, gasEstimatorService);
+                    });
                     break;
                 case BlockchainEnvironment.Testnet:
-                    services.AddSingleton<IWeb3Client>(x => new Web3Client(privateKey, ChainIds.BSCTestnet, ChainIds.PolygonTestnet, bscNodeUrl ?? RPCNodeUrls.BSC_TESTNET, polygonNodeUrl ?? RPCNodeUrls.POLYGON_TESTNET, gasPriceLevel));
+                    services.AddSingleton<IWeb3Client>(x => 
+                    {
+                        IGasEstimatorService gasEstimatorService = x.GetRequiredService<IGasEstimatorService>();
+                        return new Web3Client(privateKey, ChainIds.BSCTestnet, ChainIds.PolygonTestnet, bscNodeUrl ?? RPCNodeUrls.BSC_TESTNET, polygonNodeUrl ?? RPCNodeUrls.POLYGON_TESTNET, gasPriceLevel, gasEstimatorService);
+                    });
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("Found unsupported blochchain environment");
