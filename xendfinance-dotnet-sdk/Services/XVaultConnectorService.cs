@@ -117,7 +117,7 @@ namespace xendfinance_dotnet_sdk.Services
         {
             ReadContractABIs();
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
-            BigInteger balanceInBaseUnit = await GetShareBalance(protocolContractAddress, address, asset, network);
+            BigInteger balanceInBaseUnit = await GetShareBalance(protocolContractAddress, address, network);
             decimal balance = await ConvertBaseUnitToAmount(balanceInBaseUnit, network, protocolContractAddress);
             return balance;
         }
@@ -221,7 +221,7 @@ namespace xendfinance_dotnet_sdk.Services
             return output.Decimals;
         }
 
-        private async Task<BigInteger> GetShareBalance(string contractAddress, string address, Assets asset, Networks network)
+        private async Task<BigInteger> GetShareBalance(string contractAddress, string address, Networks network)
         {
             BalanceOfFunction function = new BalanceOfFunction()
             {
@@ -244,7 +244,7 @@ namespace xendfinance_dotnet_sdk.Services
         {
             ReadContractABIs();
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
-            BigInteger balanceInBaseUnit = await GetShareBalance(protocolContractAddress, address, asset, network);
+            BigInteger balanceInBaseUnit = await GetShareBalance(protocolContractAddress, address, network);
             BigInteger pricePerShareInBaseUnit = await GetPricePerShare(asset, network);
             BigInteger shareValueInBaseUnit = BigInteger.Multiply(pricePerShareInBaseUnit, balanceInBaseUnit);
             decimal shareValue = await ConvertBaseUnitToAmount(shareValueInBaseUnit, network, protocolContractAddress);
