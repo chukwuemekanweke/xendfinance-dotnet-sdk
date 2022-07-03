@@ -62,25 +62,39 @@ namespace xendfinance_dotnet_sdk
             return blockTimeStamp;
         }
 
-        public async Task<string> SendTransactionAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, params object[] functionInput)
+        public async Task<string> SendTransactionAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, decimal? value, params object[] functionInput)
         {
             Contract contract = GetContract(network, contractAddress, abi);
             Account account = GetAccountInstance(network);
             var function = contract.GetFunction(functionName);
-            var gas = await function.EstimateGasAsync(functionInput);
+            HexBigInteger gas = await function.EstimateGasAsync(functionInput);
             HexBigInteger gasPrice = await GetGasPrice(network, gasPriceLevel);
-            string transactionHash = await function.SendTransactionAsync(account.Address, gas, gasPrice, null, functionInput);
+
+            HexBigInteger? valueInSIUnit = null;
+            if (value.HasValue)
+            {
+                valueInSIUnit = new HexBigInteger(BigInteger.Parse((value.Value * (decimal)Math.Pow(10, 18)).ToString()));
+            }
+
+            string transactionHash = await function.SendTransactionAsync(account.Address, gas, gasPrice, valueInSIUnit, functionInput);
             return transactionHash;
         }
 
-        public async Task<TransactionResponse> SendTransactionAndWaitForReceiptAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, CancellationToken cancellationToken, params object[] functionInput)
+        public async Task<TransactionResponse> SendTransactionAndWaitForReceiptAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, decimal? value, CancellationTokenSource cancellationTokenSource, params object[] functionInput)
         {
             Contract contract = GetContract(network, contractAddress, abi);
             Account account = GetAccountInstance(network);
             var function = contract.GetFunction(functionName);
-            var gas = await function.EstimateGasAsync(functionInput);
+            HexBigInteger gas = await function.EstimateGasAsync(functionInput);
             HexBigInteger gasPrice = await GetGasPrice(network, gasPriceLevel);
-            TransactionReceipt txReceipt = await function.SendTransactionAndWaitForReceiptAsync(account.Address, gas, gasPrice, null, cancellationToken, functionInput);
+            HexBigInteger? valueInSIUnit = null;
+
+            if (value.HasValue)
+            {
+                valueInSIUnit = new HexBigInteger(BigInteger.Parse((value.Value * (decimal)Math.Pow(10, 18)).ToString()));
+            }
+
+            TransactionReceipt txReceipt = await function.SendTransactionAndWaitForReceiptAsync(from: account.Address, gas: gas, gasPrice: gasPrice, value: valueInSIUnit, receiptRequestCancellationToken: cancellationTokenSource, functionInput: functionInput);
             bool isSuccessful = txReceipt.Status == new HexBigInteger(1);
             return new TransactionResponse
             {
