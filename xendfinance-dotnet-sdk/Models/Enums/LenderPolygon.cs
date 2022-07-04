@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace xendfinance_dotnet_sdk.Models.Enums
 {
-    public enum Lenders
+    internal enum LenderPolygon
     {
-        None=0,
+        None,
+        AAVE,
         Fulcrum,
-        Fortube,
-        Venus,
-        Alpaca
+        Fortube
     }
 }

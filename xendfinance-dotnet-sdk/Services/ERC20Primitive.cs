@@ -3,10 +3,11 @@ using xendfinance_dotnet_sdk.Functions;
 using xendfinance_dotnet_sdk.Interfaces;
 using xendfinance_dotnet_sdk.Models.Enums;
 using xendfinance_dotnet_sdk.OutputDTOs.Shared;
+using xendfinance_dotnet_sdk.Services.XAuto;
 
 namespace xendfinance_dotnet_sdk.Services
 {
-    internal abstract class ERC20Primitive
+    public abstract class ERC20Primitive
     {
       
         private readonly IWeb3Client _web3Client;

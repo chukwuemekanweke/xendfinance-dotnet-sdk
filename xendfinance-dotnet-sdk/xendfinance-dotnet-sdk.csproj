@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ABIs\XAuto\Polygon\" />
+    <Folder Include="Functions\XAuto\Polygon\" />
   </ItemGroup>
 
 </Project>

@@ -1,19 +1,19 @@
 ﻿using Nethereum.Contracts.Standards.ERC20.ContractDefinition;
 using Nethereum.Web3;
 using System.Numerics;
-using System.Text;
 using xendfinance_dotnet_sdk.Functions.XAuto;
-using xendfinance_dotnet_sdk.Functions.XVault;
+using xendfinance_dotnet_sdk.Functions.XAuto.BSC;
 using xendfinance_dotnet_sdk.Interfaces;
 using xendfinance_dotnet_sdk.Models.Enums;
 using xendfinance_dotnet_sdk.Models.Exceptions;
 using xendfinance_dotnet_sdk.Models.ServiceModels;
 using xendfinance_dotnet_sdk.OutputDTOs.XAuto;
+using xendfinance_dotnet_sdk.OutputDTOs.XAuto.BSC;
 using xendfinance_dotnet_sdk.Utilities;
 
-namespace xendfinance_dotnet_sdk.Services
+namespace xendfinance_dotnet_sdk.Services.XAuto
 {
-    internal class XAutoBSCConnectorService: ERC20Primitive
+    public sealed class XAutoBSCConnectorService : ERC20Primitive
     {
 
         private string XAutoBNBContractABI = string.Empty;
@@ -22,7 +22,7 @@ namespace xendfinance_dotnet_sdk.Services
         private string ERC20ContractABI = string.Empty;
         private readonly IWeb3Client _web3Client;
 
-        public XAutoBSCConnectorService(IWeb3Client web3Client): base(web3Client)
+        public XAutoBSCConnectorService(IWeb3Client web3Client) : base(web3Client)
         {
             _web3Client = web3Client;
         }
@@ -54,10 +54,10 @@ namespace xendfinance_dotnet_sdk.Services
                     transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, protocolContractAddress, ERC20ContractABI, FunctionNames.Deposit, gasPriceLevel, amount, cancellationTokenSource, amountInBase);
                     if (!transactionResponse.IsSuccessful)
                         throw new ContractTransactionException("xVault deposit failed");
-                    return transactionResponse;       
+                    return transactionResponse;
                 default:
                     throw new ArgumentOutOfRangeException("Asset not supported");
-            }         
+            }
         }
 
         public async Task<string> DepositAsync(decimal amount, GasPriceLevel? gasPriceLevel, Assets asset, Networks network, CancellationTokenSource? cancellationTokenSource)
@@ -106,7 +106,7 @@ namespace xendfinance_dotnet_sdk.Services
             return transactionHash;
         }
 
-       
+
 
         public async Task<TransactionResponse> WithdrawBySharesAndWaitForReceiptAsync(decimal shares, GasPriceLevel? gasPriceLevel, Assets asset, CancellationTokenSource? cancellationTokenSource)
         {
@@ -190,16 +190,86 @@ namespace xendfinance_dotnet_sdk.Services
             return output.Amount;
         }
 
-        public async Task<string> FeeAddress(Assets asset)
+        public async Task<LenderBSC> Recommend(Assets asset)
         {
             string protocolContractAddress = GetProtocolContractAddress(asset);
             RecommendFunction function = new RecommendFunction();
-            RecommendFunctionOutputDTO output = await _web3Client.CallContract<RecommendFunctionOutputDTO, FeeAddressFunction>(Networks.BSC, protocolContractAddress, function);
+            RecommendFunctionOutputDTO output = await _web3Client.CallContract<RecommendFunctionOutputDTO, RecommendFunction>(Networks.BSC, protocolContractAddress, function);
             BigInteger lender = output.Lender;
+            return Enum.Parse<LenderBSC>(lender.ToString());
         }
 
+        public async Task<string> Token(Assets asset)
+        {
+            string protocolContractAddress = GetProtocolContractAddress(asset);
+            TokenFunction function = new TokenFunction();
+            TokenFunctionOutputDTO output = await _web3Client.CallContract<TokenFunctionOutputDTO, TokenFunction>(Networks.BSC, protocolContractAddress, function);
+            return output.Token;
+        }
 
+        public async Task<BigInteger> BalanceAlpaca(Assets asset)
+        {
+            string protocolContractAddress = GetProtocolContractAddress(asset);
+            BalanceAlpacaFunction function = new BalanceAlpacaFunction();
+            BalanceAlpacaOutputDTO output = await _web3Client.CallContract<BalanceAlpacaOutputDTO, BalanceAlpacaFunction>(Networks.BSC, protocolContractAddress, function);
+            return output.Balance;
+        }
 
+        public async Task<BigInteger> BalanceAlpacaInToken(Assets asset)
+        {
+            string protocolContractAddress = GetProtocolContractAddress(asset);
+            BalanceAlpacaInTokenFunction function = new BalanceAlpacaInTokenFunction();
+            BalanceAlpacaInTokenOutputDTO output = await _web3Client.CallContract<BalanceAlpacaInTokenOutputDTO, BalanceAlpacaInTokenFunction>(Networks.BSC, protocolContractAddress, function);
+            return output.Balance;
+        }
+
+        public async Task<BigInteger> BalanceFulcrum(Assets asset)
+        {
+            string protocolContractAddress = GetProtocolContractAddress(asset);
+            BalanceAlpacaFunction function = new BalanceAlpacaFunction();
+            BalanceAlpacaOutputDTO output = await _web3Client.CallContract<BalanceAlpacaOutputDTO, BalanceAlpacaFunction>(Networks.BSC, protocolContractAddress, function);
+            return output.Balance;
+        }
+
+        public async Task<BigInteger> BalanceFulcrumInToken(Assets asset)
+        {
+            string protocolContractAddress = GetProtocolContractAddress(asset);
+            BalanceFulcrumInTokenFunction function = new BalanceFulcrumInTokenFunction();
+            BalanceFulcrumInTokenOutputDTO output = await _web3Client.CallContract<BalanceFulcrumInTokenOutputDTO, BalanceFulcrumInTokenFunction>(Networks.BSC, protocolContractAddress, function);
+            return output.Balance;
+        }
+
+        public async Task<BigInteger> BalanceFortube(Assets asset)
+        {
+            string protocolContractAddress = GetProtocolContractAddress(asset);
+            BalanceFortubeFunction function = new BalanceFortubeFunction();
+            BalanceFortubeOutputDTO output = await _web3Client.CallContract<BalanceFortubeOutputDTO, BalanceFortubeFunction>(Networks.BSC, protocolContractAddress, function);
+            return output.Balance;
+        }
+
+        public async Task<BigInteger> BalanceFortubeInToken(Assets asset)
+        {
+            string protocolContractAddress = GetProtocolContractAddress(asset);
+            BalanceFortubeInTokenFunction function = new BalanceFortubeInTokenFunction();
+            BalanceFortubeInTokenOutputDTO output = await _web3Client.CallContract<BalanceFortubeInTokenOutputDTO, BalanceFortubeInTokenFunction>(Networks.BSC, protocolContractAddress, function);
+            return output.Balance;
+        }
+
+        public async Task<BigInteger> BalanceVenus(Assets asset)
+        {
+            string protocolContractAddress = GetProtocolContractAddress(asset);
+            BalanceVenusFunction function = new BalanceVenusFunction();
+            BalanceVenusOutputDTO output = await _web3Client.CallContract<BalanceVenusOutputDTO, BalanceVenusFunction>(Networks.BSC, protocolContractAddress, function);
+            return output.Balance;
+        }
+
+        public async Task<BigInteger> BalanceVenusInToken(Assets asset)
+        {
+            string protocolContractAddress = GetProtocolContractAddress(asset);
+            BalanceVenusInTokenFunction function = new BalanceVenusInTokenFunction();
+            BalanceVenusInTokenOutputDTO output = await _web3Client.CallContract<BalanceVenusInTokenOutputDTO, BalanceVenusInTokenFunction>(Networks.BSC, protocolContractAddress, function);
+            return output.Balance;
+        }
 
 
         private string RetrieveABIBasedOnAsset(Assets asset)
@@ -284,7 +354,7 @@ namespace xendfinance_dotnet_sdk.Services
         {
             ReadContractABIs();
             string protocolContractAddress = GetProtocolContractAddress(asset);
-            BigInteger balanceInBaseUnit = await GetShareBalance(protocolContractAddress, address, asset);
+            BigInteger balanceInBaseUnit = await GetBalanceOf(protocolContractAddress, address, Networks.BSC);
             BigInteger pricePerShareInBaseUnit = await GetPricePerFullShare(asset);
             BigInteger shareValueInBaseUnit = BigInteger.Multiply(pricePerShareInBaseUnit, balanceInBaseUnit);
             decimal shareValue = await ConvertBaseUnitToAmount(shareValueInBaseUnit, protocolContractAddress);
@@ -301,10 +371,10 @@ namespace xendfinance_dotnet_sdk.Services
         {
             if (!string.IsNullOrWhiteSpace(XAutoBNBContractABI) && !string.IsNullOrWhiteSpace(XAutoERC20ContractABI))
             {
-                return ;
+                return;
             }
 
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "ABIs", "XAuto", "BSC",  "xBNB.json");
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "ABIs", "XAuto", "BSC", "xBNB.json");
             using (StreamReader r = new StreamReader(path))
             {
                 string contractABI = r.ReadToEnd();
@@ -363,11 +433,11 @@ namespace xendfinance_dotnet_sdk.Services
 
         private string GetAssetContractAddress(Assets asset)
         {
-            string contractAddress = GetBSCAssetContractAddress(asset);           
+            string contractAddress = GetBSCAssetContractAddress(asset);
             return contractAddress;
         }
 
-     
+
         private string GetBSCAssetContractAddress(Assets asset)
         {
             string contractAddress;
