@@ -3,11 +3,11 @@ using Nethereum.Contracts;
 
 namespace xendfinance_dotnet_sdk.Functions.XAuto.BSC
 {
-    public partial class BalanceVenusInTokenFunction : BalanceVenusInTokenFunctionBase { }
+    public partial class BalanceVenusInTokenFunction : BalanceVenusInTokenFunctionBase
+    { }
 
-    [Function("balanceFulcrumInToken", "uint256")]
+    [Function("balanceVenusInToken", "uint256")]
     public class BalanceVenusInTokenFunctionBase : FunctionMessage
     {
-
     }
 }

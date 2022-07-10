@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto
         public virtual BigInteger Lender { get; set; }
     }
 
-    public partial class RecommendFunctionOutputDTO : RecommendFunctionOutputDTOBase { }
+    public partial class RecommendFunctionOutputDTO : RecommendFunctionOutputDTOBase
+    { }
 }

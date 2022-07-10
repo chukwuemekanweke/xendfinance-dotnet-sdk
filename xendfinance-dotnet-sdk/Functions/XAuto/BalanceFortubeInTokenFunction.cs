@@ -3,11 +3,11 @@ using Nethereum.Contracts;
 
 namespace xendfinance_dotnet_sdk.Functions.XAuto
 {
-    public partial class BalanceFortubeInTokenFunction : BalanceFortubeInTokenFunctionBase { }
+    public partial class BalanceFortubeInTokenFunction : BalanceFortubeInTokenFunctionBase
+    { }
 
     [Function("balanceFortubeInToken", "uint256")]
     public class BalanceFortubeInTokenFunctionBase : FunctionMessage
     {
-
     }
 }

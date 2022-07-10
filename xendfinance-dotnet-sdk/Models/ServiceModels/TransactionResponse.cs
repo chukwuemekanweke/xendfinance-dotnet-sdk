@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace xendfinance_dotnet_sdk.Models.ServiceModels
+﻿namespace xendfinance_dotnet_sdk.Models.ServiceModels
 {
     public class TransactionResponse
     {

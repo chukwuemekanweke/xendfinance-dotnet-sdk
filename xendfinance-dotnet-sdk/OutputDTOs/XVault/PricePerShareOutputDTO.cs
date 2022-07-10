@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XVault
         public virtual BigInteger PricePerShare { get; set; }
     }
 
-    public partial class PricePerShareOutputDTO : PricePerShareOutputDTOBase { }
+    public partial class PricePerShareOutputDTO : PricePerShareOutputDTOBase
+    { }
 }

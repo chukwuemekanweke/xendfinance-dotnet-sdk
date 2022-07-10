@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto.BSC
         public virtual BigInteger Balance { get; set; }
     }
 
-    public partial class BalanceAlpacaOutputDTO : BalanceAlpacaOutputDTOBase { }
+    public partial class BalanceAlpacaOutputDTO : BalanceAlpacaOutputDTOBase
+    { }
 }

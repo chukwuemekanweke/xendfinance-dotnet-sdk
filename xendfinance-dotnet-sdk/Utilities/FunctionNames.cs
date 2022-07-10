@@ -5,6 +5,5 @@
         public const string Approve = "approve";
         public const string Deposit = "deposit";
         public const string WithdrawShares = "withdraw";
-
     }
 }

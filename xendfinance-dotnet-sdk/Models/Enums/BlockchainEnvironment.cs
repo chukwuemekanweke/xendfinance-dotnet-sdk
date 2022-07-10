@@ -2,7 +2,7 @@
 {
     public enum BlockchainEnvironment
     {
-        Mainnet=1,
+        Mainnet = 1,
         Testnet
     }
 }

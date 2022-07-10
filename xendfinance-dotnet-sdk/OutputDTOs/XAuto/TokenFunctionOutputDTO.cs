@@ -9,5 +9,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto
         public virtual string Token { get; set; } = string.Empty;
     }
 
-    public partial class TokenFunctionOutputDTO : TokenFunctionOutputDTOBase { }
+    public partial class TokenFunctionOutputDTO : TokenFunctionOutputDTOBase
+    { }
 }

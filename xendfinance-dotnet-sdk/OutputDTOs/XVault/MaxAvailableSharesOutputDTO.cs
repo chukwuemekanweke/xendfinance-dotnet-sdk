@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XVault
         public virtual BigInteger MaxAvailableShares { get; set; }
     }
 
-    public partial class MaxAvailableSharesOutputDTO : MaxAvailableSharesOutputDTOBase { }
+    public partial class MaxAvailableSharesOutputDTO : MaxAvailableSharesOutputDTOBase
+    { }
 }

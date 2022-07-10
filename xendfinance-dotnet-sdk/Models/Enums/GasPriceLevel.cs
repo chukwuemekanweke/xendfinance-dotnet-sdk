@@ -2,7 +2,7 @@
 {
     public enum GasPriceLevel
     {
-        Slow=1,
+        Slow = 1,
         Average,
         Fast
     }

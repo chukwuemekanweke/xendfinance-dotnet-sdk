@@ -2,7 +2,7 @@
 {
     public enum LenderBSC
     {
-        None=0,
+        None = 0,
         Fulcrum,
         Fortube,
         Venus,

@@ -1,7 +1,7 @@
 ﻿using Nethereum.ABI.FunctionEncoding.Attributes;
 using System.Numerics;
 
-namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto.BSC
+namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto
 {
     [FunctionOutput]
     public class BalanceFulcrumOutputDTOBase : IFunctionOutputDTO
@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto.BSC
         public virtual BigInteger Balance { get; set; }
     }
 
-    public partial class BalanceFulcrumOutputDTO : BalanceFulcrumOutputDTOBase { }
+    public partial class BalanceFulcrumOutputDTO : BalanceFulcrumOutputDTOBase
+    { }
 }

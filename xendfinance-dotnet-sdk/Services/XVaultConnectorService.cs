@@ -14,7 +14,6 @@ namespace xendfinance_dotnet_sdk.Services
 {
     internal class XVaultConnectorService : IXVaultConnectorService
     {
-
         private string XVaultContractABI = string.Empty;
         private string ERC20ContractABI = string.Empty;
         private readonly IWeb3Client _web3Client;
@@ -121,7 +120,7 @@ namespace xendfinance_dotnet_sdk.Services
             decimal balance = await ConvertBaseUnitToAmount(balanceInBaseUnit, network, protocolContractAddress);
             return balance;
         }
-            
+
         public async Task<decimal> MaxAvailableSharesAsync(Assets asset, Networks network)
         {
             ReadContractABIs();
@@ -171,17 +170,16 @@ namespace xendfinance_dotnet_sdk.Services
             GetAPYFunction function = new GetAPYFunction();
             GetAPYOutputDTO output = await _web3Client.CallContract<GetAPYOutputDTO, GetAPYFunction>(network, protocolContractAddress, function);
             BigInteger apyInBaseUnit = output.APY;
-            double apy = (double) (await ConvertBaseUnitToAmount(apyInBaseUnit, network, protocolContractAddress));
+            double apy = (double)(await ConvertBaseUnitToAmount(apyInBaseUnit, network, protocolContractAddress));
             return apy;
         }
 
         private async Task<decimal> ConvertBaseUnitToAmount(BigInteger amount, Networks network, string assetContractAddress)
         {
-            BigInteger decimalPlaces  = await GetDecimals(network, assetContractAddress); // Get's decimals of tokenized asset. BUSD - 18, USDT - 6
+            BigInteger decimalPlaces = await GetDecimals(network, assetContractAddress); // Get's decimals of tokenized asset. BUSD - 18, USDT - 6
             decimal dp = decimal.Parse(decimalPlaces.ToString()); // converts string representation of BigInteger to int type
             decimal divisorValue = (decimal)Math.Pow(10, (int)dp); // 10 ^ dp
             BigInteger divisor = BigInteger.Parse(divisorValue.ToString()); // Get's the BigInteger representation of 10 ^ dp
-
 
             BigInteger quotient = BigInteger.Divide(amount, divisor);
             BigInteger remainder = BigInteger.Remainder(amount, divisor);
@@ -262,8 +260,6 @@ namespace xendfinance_dotnet_sdk.Services
             return totalAssets;
         }
 
-      
-
         private void ReadContractABIs()
         {
             ReadProtocolContractAbi();
@@ -272,7 +268,7 @@ namespace xendfinance_dotnet_sdk.Services
 
         private string ReadProtocolContractAbi()
         {
-            if(!string.IsNullOrWhiteSpace(XVaultContractABI))
+            if (!string.IsNullOrWhiteSpace(XVaultContractABI))
             {
                 return XVaultContractABI;
             }
@@ -313,24 +309,26 @@ namespace xendfinance_dotnet_sdk.Services
                         case Assets.BUSD:
                             contractAddress = ProtocolContractAddresses.BUSD_VAULT_BSC_CONTRACT_ADDRESS;
                             break;
+
                         case Assets.USDC:
                             contractAddress = ProtocolContractAddresses.USDC_VAULT_BSC_CONTRACT_ADDRESS;
                             break;
+
                         case Assets.USDT:
                             contractAddress = ProtocolContractAddresses.USDT_VAULT_BSC_CONTRACT_ADDRESS;
                             break;
+
                         default:
                             throw new ArgumentOutOfRangeException("Asset not supported on network for xVault");
                     }
                     break;
+
                 case Networks.POLYGON:
                 default:
                     throw new ArgumentOutOfRangeException("Network not supported for xVault");
-
             }
             return contractAddress;
         }
-
 
         private string GetAssetContractAddress(Assets asset, Networks network)
         {
@@ -340,12 +338,13 @@ namespace xendfinance_dotnet_sdk.Services
                 case Networks.BSC:
                     contractAddress = GetBSCAssetContractAddress(asset);
                     break;
+
                 case Networks.POLYGON:
                     contractAddress = GetPolygonAssetContractAddress(asset);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException("Network not supported for Xend Finance Protocol");
-
             }
             return contractAddress;
         }
@@ -358,21 +357,27 @@ namespace xendfinance_dotnet_sdk.Services
                 case Assets.BUSD:
                     contractAddress = AssetContractAddresses.BUSD_BSC;
                     break;
+
                 case Assets.USDC:
                     contractAddress = AssetContractAddresses.USDC_BSC;
                     break;
+
                 case Assets.USDT:
                     contractAddress = AssetContractAddresses.USDT_BSC;
                     break;
+
                 case Assets.BNB:
                     contractAddress = AssetContractAddresses.BNB_BSC;
                     break;
+
                 case Assets.AAVE:
                     contractAddress = AssetContractAddresses.AAVE_BSC;
                     break;
+
                 case Assets.WBTC:
                     contractAddress = AssetContractAddresses.WBTC_BSC;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException("Asset is not supported on network");
             }
@@ -388,28 +393,33 @@ namespace xendfinance_dotnet_sdk.Services
                 case Assets.BUSD:
                     contractAddress = AssetContractAddresses.BUSD_BSC;
                     break;
+
                 case Assets.USDC:
                     contractAddress = AssetContractAddresses.USDC_BSC;
                     break;
+
                 case Assets.USDT:
                     contractAddress = AssetContractAddresses.USDT_BSC;
                     break;
+
                 case Assets.BNB:
                     contractAddress = AssetContractAddresses.BNB_BSC;
                     break;
+
                 case Assets.AAVE:
                     contractAddress = AssetContractAddresses.AAVE_BSC;
                     break;
+
                 case Assets.WBTC:
                     contractAddress = AssetContractAddresses.WBTC_BSC;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException("Asset is not supported on network");
             }
 
             return contractAddress;
         }
-
 
         private BigInteger ConvertMaxLossPercentage(double maxLossPercentage)
         {

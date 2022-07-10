@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto
         public virtual BigInteger Amount { get; set; }
     }
 
-    public partial class FeeAmountDTO : FeeAmountDTOBase { }
+    public partial class FeeAmountDTO : FeeAmountDTOBase
+    { }
 }

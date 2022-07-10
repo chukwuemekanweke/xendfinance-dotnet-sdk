@@ -32,8 +32,6 @@ namespace xendfinance_dotnet_sdk
             _gasEstimatorService = gasEstimatorService;
         }
 
-      
-
         public async Task<IEnumerable<EventLog<TEventMessage>>> GetEvents<TEventMessage>(Networks network, string contractAddress, ulong startBlock, ulong endBlock) where TEventMessage : IEventDTO, new()
         {
             BlockParameter startBlockParameter = new BlockParameter(startBlock);
@@ -138,11 +136,14 @@ namespace xendfinance_dotnet_sdk
             switch (gasPriceLevel.Value)
             {
                 case GasPriceLevel.Slow:
-                    return new HexBigInteger(new BigInteger( gasEstimateResponse.LowGas));
+                    return new HexBigInteger(new BigInteger(gasEstimateResponse.LowGas));
+
                 case GasPriceLevel.Average:
                     return new HexBigInteger(new BigInteger(gasEstimateResponse.AverageGas));
+
                 case GasPriceLevel.Fast:
                     return new HexBigInteger(new BigInteger(gasEstimateResponse.FastGas));
+
                 default:
                     throw new ArgumentOutOfRangeException("Unsupported Gas Price Level");
             }
@@ -162,8 +163,10 @@ namespace xendfinance_dotnet_sdk
             {
                 case Networks.BSC:
                     return _bscAccount;
+
                 case Networks.POLYGON:
                     return _polygonAccount;
+
                 default:
                     throw new ArgumentOutOfRangeException("Unsupported Network Chain");
             }
@@ -175,8 +178,10 @@ namespace xendfinance_dotnet_sdk
             {
                 case Networks.BSC:
                     return _bscWeb3;
+
                 case Networks.POLYGON:
                     return _polygonWeb3;
+
                 default:
                     throw new ArgumentOutOfRangeException("Unsupported Network Chain");
             }

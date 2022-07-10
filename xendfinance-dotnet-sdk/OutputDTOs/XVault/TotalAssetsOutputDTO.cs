@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XVault
         public virtual BigInteger TotalAssets { get; set; }
     }
 
-    public partial class TotalAssetsOutputDTO : TotalAssetsOutputDTOBase { }
+    public partial class TotalAssetsOutputDTO : TotalAssetsOutputDTOBase
+    { }
 }

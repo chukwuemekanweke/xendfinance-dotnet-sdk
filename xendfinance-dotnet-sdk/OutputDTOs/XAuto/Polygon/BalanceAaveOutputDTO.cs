@@ -4,12 +4,12 @@ using System.Numerics;
 namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto.BSC
 {
     [FunctionOutput]
-    public class BalanceFortubeInTokenOutputDTOBase : IFunctionOutputDTO
+    public class BalanceAaveOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("uint256", "", 1)]
         public virtual BigInteger Balance { get; set; }
     }
 
-    public partial class BalanceFortubeInTokenOutputDTO : BalanceFortubeInTokenOutputDTOBase { }
+    public partial class BalanceAaveOutputDTO : BalanceAaveOutputDTOBase
+    { }
 }
-

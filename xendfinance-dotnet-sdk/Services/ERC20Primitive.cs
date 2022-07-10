@@ -3,13 +3,11 @@ using xendfinance_dotnet_sdk.Functions;
 using xendfinance_dotnet_sdk.Interfaces;
 using xendfinance_dotnet_sdk.Models.Enums;
 using xendfinance_dotnet_sdk.OutputDTOs.Shared;
-using xendfinance_dotnet_sdk.Services.XAuto;
 
 namespace xendfinance_dotnet_sdk.Services
 {
     public abstract class ERC20Primitive
     {
-      
         private readonly IWeb3Client _web3Client;
 
         public ERC20Primitive(IWeb3Client web3Client)
@@ -34,6 +32,5 @@ namespace xendfinance_dotnet_sdk.Services
             BigInteger balanceInBaseUnit = output.Balance;
             return balanceInBaseUnit;
         }
-
     }
 }

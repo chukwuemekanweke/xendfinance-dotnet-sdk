@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto
         public virtual BigInteger Value { get; set; }
     }
 
-    public partial class GetPricePerFullShareOutputDTO : GetPricePerFullShareOutputDTOBase { }
+    public partial class GetPricePerFullShareOutputDTO : GetPricePerFullShareOutputDTOBase
+    { }
 }

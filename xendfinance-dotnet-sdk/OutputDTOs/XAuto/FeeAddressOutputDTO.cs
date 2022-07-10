@@ -9,5 +9,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto
         public virtual string Address { get; set; } = string.Empty;
     }
 
-    public partial class FeeAddressOutputDTO : FeeAddressOutputDTOBase { }
+    public partial class FeeAddressOutputDTO : FeeAddressOutputDTOBase
+    { }
 }

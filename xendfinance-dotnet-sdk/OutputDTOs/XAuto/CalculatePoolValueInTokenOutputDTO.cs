@@ -9,5 +9,7 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XAuto
         [Parameter("uint256", "", 1)]
         public virtual BigInteger Value { get; set; }
     }
-    public partial class CalculatePoolValueInTokenOutputDTO : CalculatePoolValueInTokenOutputDTOBase { }
+
+    public partial class CalculatePoolValueInTokenOutputDTO : CalculatePoolValueInTokenOutputDTOBase
+    { }
 }
