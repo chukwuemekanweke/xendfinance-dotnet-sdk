@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XVault
         public virtual BigInteger APY { get; set; }
     }
 
-    public partial class GetAPYOutputDTO : GetAPYOutputDTOBase { }
+    public partial class GetAPYOutputDTO : GetAPYOutputDTOBase
+    { }
 }

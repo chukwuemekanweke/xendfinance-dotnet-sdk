@@ -14,7 +14,6 @@ namespace xendfinance_dotnet_sdk.Services
 {
     internal class XVaultConnectorService : IXVaultConnectorService
     {
-
         private string XVaultContractABI = string.Empty;
         private string ERC20ContractABI = string.Empty;
         private readonly IWeb3Client _web3Client;
@@ -24,66 +23,66 @@ namespace xendfinance_dotnet_sdk.Services
             _web3Client = web3Client;
         }
 
-        public async Task<TransactionResponse> DepositAndWaitForReceiptAsync(decimal amount, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<TransactionResponse> DepositAndWaitForReceiptAsync(decimal amount, GasPriceLevel? gasPriceLevel, Assets asset, Networks network, CancellationTokenSource? cancellationTokenSource)
         {
             ReadContractABIs();
             string tokenContractAddress = GetAssetContractAddress(asset, network);
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
             BigInteger amountInBase = await ConvertAmountToBaseUnit(amount, network, tokenContractAddress);
-            TransactionResponse transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, tokenContractAddress, ERC20ContractABI, FunctionNames.Approve, gasPriceLevel, cancellationToken, protocolContractAddress, amountInBase);
+            TransactionResponse transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, tokenContractAddress, ERC20ContractABI, FunctionNames.Approve, gasPriceLevel, null, cancellationTokenSource, protocolContractAddress, amountInBase);
 
             if (!transactionResponse.IsSuccessful)
                 throw new ContractTransactionException("Approval for xVault deposit failed");
 
-            transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, protocolContractAddress, ERC20ContractABI, FunctionNames.Deposit, gasPriceLevel, cancellationToken, amountInBase);
+            transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, protocolContractAddress, XVaultContractABI, FunctionNames.Deposit, gasPriceLevel, null, cancellationTokenSource, amountInBase);
             if (!transactionResponse.IsSuccessful)
                 throw new ContractTransactionException("xVault deposit failed");
 
             return transactionResponse;
         }
 
-        public async Task<string> DepositAsync(decimal amount, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<string> DepositAsync(decimal amount, GasPriceLevel? gasPriceLevel, Assets asset, Networks network, CancellationTokenSource? cancellationTokenSource)
         {
             ReadContractABIs();
             string tokenContractAddress = GetAssetContractAddress(asset, network);
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
             BigInteger amountInBase = await ConvertAmountToBaseUnit(amount, network, tokenContractAddress);
-            TransactionResponse transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, tokenContractAddress, ERC20ContractABI, FunctionNames.Approve, gasPriceLevel, cancellationToken, protocolContractAddress, amountInBase);
+            TransactionResponse transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, tokenContractAddress, ERC20ContractABI, FunctionNames.Approve, gasPriceLevel, null, cancellationTokenSource, protocolContractAddress, amountInBase);
 
             if (!transactionResponse.IsSuccessful)
                 throw new ContractTransactionException("Approval for xVault deposit failed");
 
-            string transactionHash = await _web3Client.SendTransactionAsync(network, protocolContractAddress, ERC20ContractABI, FunctionNames.Deposit, gasPriceLevel, cancellationToken, amountInBase);
+            string transactionHash = await _web3Client.SendTransactionAsync(network, protocolContractAddress, XVaultContractABI, FunctionNames.Deposit, gasPriceLevel, null, cancellationTokenSource, amountInBase);
             if (string.IsNullOrWhiteSpace(transactionHash))
                 throw new ContractTransactionException("xVault deposit failed");
             return transactionHash;
         }
 
-        public async Task<string> WithdrawBySharesAsync(decimal shares, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC)
+        public async Task<string> WithdrawBySharesAsync(decimal shares, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network)
         {
             ReadContractABIs();
             BigInteger maxLoss = ConvertMaxLossPercentage(maxLossPercentage);
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
             string tokenContractAddress = GetAssetContractAddress(asset, network);
             BigInteger sharesInBase = await ConvertAmountToBaseUnit(shares, network, tokenContractAddress);
-            string transactionHash = await _web3Client.SendTransactionAsync(network, protocolContractAddress, ERC20ContractABI, FunctionNames.WithdrawShares, gasPriceLevel, sharesInBase, recipientAddress, maxLoss);
+            string transactionHash = await _web3Client.SendTransactionAsync(network, protocolContractAddress, XVaultContractABI, FunctionNames.WithdrawShares, gasPriceLevel, null, sharesInBase, recipientAddress, maxLoss);
             if (string.IsNullOrWhiteSpace(transactionHash))
                 throw new ContractTransactionException("xVault withdraw by shares failed");
             return transactionHash;
         }
 
-        public async Task<TransactionResponse> WithdrawBySharesAndWaitForReceiptAsync(decimal shares, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC, CancellationToken cancellationToken = default)
+        public async Task<TransactionResponse> WithdrawBySharesAndWaitForReceiptAsync(decimal shares, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network, CancellationTokenSource? cancellationTokenSource)
         {
             ReadContractABIs();
             BigInteger maxLoss = ConvertMaxLossPercentage(maxLossPercentage);
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
             string tokenContractAddress = GetAssetContractAddress(asset, network);
             BigInteger sharesInBase = await ConvertAmountToBaseUnit(shares, network, tokenContractAddress);
-            TransactionResponse transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, protocolContractAddress, ERC20ContractABI, FunctionNames.WithdrawShares, gasPriceLevel, cancellationToken, sharesInBase, recipientAddress, maxLoss);
+            TransactionResponse transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, protocolContractAddress, XVaultContractABI, FunctionNames.WithdrawShares, gasPriceLevel, null, cancellationTokenSource, sharesInBase, recipientAddress, maxLoss);
             return transactionResponse;
         }
 
-        public async Task<string> WithdrawAsync(decimal amount, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC)
+        public async Task<string> WithdrawAsync(decimal amount, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network)
         {
             ReadContractABIs();
             BigInteger maxLoss = ConvertMaxLossPercentage(maxLossPercentage);
@@ -93,13 +92,13 @@ namespace xendfinance_dotnet_sdk.Services
             BigInteger amountInBase = await ConvertAmountToBaseUnit(amount, network, tokenContractAddress);
             BigInteger shareEquivalent = await GetShareEquivalentOfAmount(amountInBase, asset, network);
 
-            string transactionHash = await _web3Client.SendTransactionAsync(network, protocolContractAddress, ERC20ContractABI, FunctionNames.WithdrawShares, gasPriceLevel, shareEquivalent, recipientAddress, maxLoss);
+            string transactionHash = await _web3Client.SendTransactionAsync(network, protocolContractAddress, XVaultContractABI, FunctionNames.WithdrawShares, gasPriceLevel, null, shareEquivalent, recipientAddress, maxLoss);
             if (string.IsNullOrWhiteSpace(transactionHash))
                 throw new ContractTransactionException("xVault withdraw by shares failed");
             return transactionHash;
         }
 
-        public async Task<TransactionResponse> WithdrawAndWaitForReceiptAsync(decimal amount, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network = Networks.BSC, CancellationToken cancellationToken = default)
+        public async Task<TransactionResponse> WithdrawAndWaitForReceiptAsync(decimal amount, string recipientAddress, double maxLossPercentage, GasPriceLevel? gasPriceLevel, Assets asset, Networks network, CancellationTokenSource? cancellationTokenSource)
         {
             ReadContractABIs();
             BigInteger maxLoss = ConvertMaxLossPercentage(maxLossPercentage);
@@ -109,20 +108,20 @@ namespace xendfinance_dotnet_sdk.Services
             BigInteger amountInBase = await ConvertAmountToBaseUnit(amount, network, tokenContractAddress);
             BigInteger shareEquivalent = await GetShareEquivalentOfAmount(amountInBase, asset, network);
 
-            TransactionResponse transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, protocolContractAddress, ERC20ContractABI, FunctionNames.WithdrawShares, gasPriceLevel, cancellationToken, shareEquivalent, recipientAddress, maxLoss);
+            TransactionResponse transactionResponse = await _web3Client.SendTransactionAndWaitForReceiptAsync(network, protocolContractAddress, XVaultContractABI, FunctionNames.WithdrawShares, gasPriceLevel, null, cancellationTokenSource, shareEquivalent, recipientAddress, maxLoss);
             return transactionResponse;
         }
 
-        public async Task<decimal> GetShareBalanceAsync(string address, Assets asset, Networks network = Networks.BSC)
+        public async Task<decimal> GetShareBalanceAsync(string address, Assets asset, Networks network)
         {
             ReadContractABIs();
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
-            BigInteger balanceInBaseUnit = await GetShareBalance(protocolContractAddress, address, asset, network);
+            BigInteger balanceInBaseUnit = await GetShareBalance(protocolContractAddress, address, network);
             decimal balance = await ConvertBaseUnitToAmount(balanceInBaseUnit, network, protocolContractAddress);
             return balance;
         }
-            
-        public async Task<decimal> MaxAvailableSharesAsync(Assets asset, Networks network = Networks.BSC)
+
+        public async Task<decimal> MaxAvailableSharesAsync(Assets asset, Networks network)
         {
             ReadContractABIs();
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
@@ -133,17 +132,17 @@ namespace xendfinance_dotnet_sdk.Services
             return balance;
         }
 
-        public Task<decimal> GetCreditAvailableAsync(string strategyAddress, Assets asset, Networks network = Networks.BSC)
+        public Task<decimal> GetCreditAvailableAsync(string strategyAddress, Assets asset, Networks network)
         {
             throw new NotImplementedException();
         }
 
-        public Task<decimal> GetDebtOutstandingAsync(string strategyAddress, Assets asset, Networks network = Networks.BSC)
+        public Task<decimal> GetDebtOutstandingAsync(string strategyAddress, Assets asset, Networks network)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<decimal> GetPricePerShareAsync(Assets asset, Networks network = Networks.BSC)
+        public async Task<decimal> GetPricePerShareAsync(Assets asset, Networks network)
         {
             ReadContractABIs();
             string tokenContractAddress = GetAssetContractAddress(asset, network);
@@ -152,7 +151,7 @@ namespace xendfinance_dotnet_sdk.Services
             return pricePerShare;
         }
 
-        public async Task<decimal> GetDepositLimit(Assets asset, Networks network = Networks.BSC)
+        public async Task<decimal> GetDepositLimit(Assets asset, Networks network)
         {
             ReadContractABIs();
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
@@ -164,24 +163,23 @@ namespace xendfinance_dotnet_sdk.Services
             return depositLimit;
         }
 
-        public async Task<double> GetAPYAsync(Assets asset, Networks network = Networks.BSC)
+        public async Task<double> GetAPYAsync(Assets asset, Networks network)
         {
             ReadContractABIs();
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
             GetAPYFunction function = new GetAPYFunction();
             GetAPYOutputDTO output = await _web3Client.CallContract<GetAPYOutputDTO, GetAPYFunction>(network, protocolContractAddress, function);
             BigInteger apyInBaseUnit = output.APY;
-            double apy = (double) (await ConvertBaseUnitToAmount(apyInBaseUnit, network, protocolContractAddress));
+            double apy = (double)(await ConvertBaseUnitToAmount(apyInBaseUnit, network, protocolContractAddress));
             return apy;
         }
 
         private async Task<decimal> ConvertBaseUnitToAmount(BigInteger amount, Networks network, string assetContractAddress)
         {
-            BigInteger decimalPlaces  = await GetDecimals(network, assetContractAddress); // Get's decimals of tokenized asset. BUSD - 18, USDT - 6
+            BigInteger decimalPlaces = await GetDecimals(network, assetContractAddress); // Get's decimals of tokenized asset. BUSD - 18, USDT - 6
             decimal dp = decimal.Parse(decimalPlaces.ToString()); // converts string representation of BigInteger to int type
             decimal divisorValue = (decimal)Math.Pow(10, (int)dp); // 10 ^ dp
             BigInteger divisor = BigInteger.Parse(divisorValue.ToString()); // Get's the BigInteger representation of 10 ^ dp
-
 
             BigInteger quotient = BigInteger.Divide(amount, divisor);
             BigInteger remainder = BigInteger.Remainder(amount, divisor);
@@ -221,7 +219,7 @@ namespace xendfinance_dotnet_sdk.Services
             return output.Decimals;
         }
 
-        private async Task<BigInteger> GetShareBalance(string contractAddress, string address, Assets asset, Networks network)
+        private async Task<BigInteger> GetShareBalance(string contractAddress, string address, Networks network)
         {
             BalanceOfFunction function = new BalanceOfFunction()
             {
@@ -240,18 +238,18 @@ namespace xendfinance_dotnet_sdk.Services
             return output.PricePerShare;
         }
 
-        public async Task<decimal> GetWorthOfSharesAsync(string address, Assets asset, Networks network = Networks.BSC)
+        public async Task<decimal> GetWorthOfSharesAsync(string address, Assets asset, Networks network)
         {
             ReadContractABIs();
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
-            BigInteger balanceInBaseUnit = await GetShareBalance(protocolContractAddress, address, asset, network);
+            BigInteger balanceInBaseUnit = await GetShareBalance(protocolContractAddress, address, network);
             BigInteger pricePerShareInBaseUnit = await GetPricePerShare(asset, network);
             BigInteger shareValueInBaseUnit = BigInteger.Multiply(pricePerShareInBaseUnit, balanceInBaseUnit);
             decimal shareValue = await ConvertBaseUnitToAmount(shareValueInBaseUnit, network, protocolContractAddress);
             return shareValue;
         }
 
-        public async Task<decimal> GetTotalAssetsAsync(Assets asset, Networks network = Networks.BSC)
+        public async Task<decimal> GetTotalAssetsAsync(Assets asset, Networks network)
         {
             ReadContractABIs();
             string protocolContractAddress = GetProtocolContractAddress(asset, network);
@@ -262,8 +260,6 @@ namespace xendfinance_dotnet_sdk.Services
             return totalAssets;
         }
 
-      
-
         private void ReadContractABIs()
         {
             ReadProtocolContractAbi();
@@ -272,7 +268,7 @@ namespace xendfinance_dotnet_sdk.Services
 
         private string ReadProtocolContractAbi()
         {
-            if(!string.IsNullOrWhiteSpace(XVaultContractABI))
+            if (!string.IsNullOrWhiteSpace(XVaultContractABI))
             {
                 return XVaultContractABI;
             }
@@ -313,24 +309,26 @@ namespace xendfinance_dotnet_sdk.Services
                         case Assets.BUSD:
                             contractAddress = ProtocolContractAddresses.BUSD_VAULT_BSC_CONTRACT_ADDRESS;
                             break;
+
                         case Assets.USDC:
                             contractAddress = ProtocolContractAddresses.USDC_VAULT_BSC_CONTRACT_ADDRESS;
                             break;
+
                         case Assets.USDT:
                             contractAddress = ProtocolContractAddresses.USDT_VAULT_BSC_CONTRACT_ADDRESS;
                             break;
+
                         default:
                             throw new ArgumentOutOfRangeException("Asset not supported on network for xVault");
                     }
                     break;
+
                 case Networks.POLYGON:
                 default:
                     throw new ArgumentOutOfRangeException("Network not supported for xVault");
-
             }
             return contractAddress;
         }
-
 
         private string GetAssetContractAddress(Assets asset, Networks network)
         {
@@ -340,12 +338,13 @@ namespace xendfinance_dotnet_sdk.Services
                 case Networks.BSC:
                     contractAddress = GetBSCAssetContractAddress(asset);
                     break;
+
                 case Networks.POLYGON:
                     contractAddress = GetPolygonAssetContractAddress(asset);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException("Network not supported for Xend Finance Protocol");
-
             }
             return contractAddress;
         }
@@ -358,21 +357,27 @@ namespace xendfinance_dotnet_sdk.Services
                 case Assets.BUSD:
                     contractAddress = AssetContractAddresses.BUSD_BSC;
                     break;
+
                 case Assets.USDC:
                     contractAddress = AssetContractAddresses.USDC_BSC;
                     break;
+
                 case Assets.USDT:
                     contractAddress = AssetContractAddresses.USDT_BSC;
                     break;
+
                 case Assets.BNB:
                     contractAddress = AssetContractAddresses.BNB_BSC;
                     break;
+
                 case Assets.AAVE:
                     contractAddress = AssetContractAddresses.AAVE_BSC;
                     break;
+
                 case Assets.WBTC:
                     contractAddress = AssetContractAddresses.WBTC_BSC;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException("Asset is not supported on network");
             }
@@ -388,28 +393,33 @@ namespace xendfinance_dotnet_sdk.Services
                 case Assets.BUSD:
                     contractAddress = AssetContractAddresses.BUSD_BSC;
                     break;
+
                 case Assets.USDC:
                     contractAddress = AssetContractAddresses.USDC_BSC;
                     break;
+
                 case Assets.USDT:
                     contractAddress = AssetContractAddresses.USDT_BSC;
                     break;
+
                 case Assets.BNB:
                     contractAddress = AssetContractAddresses.BNB_BSC;
                     break;
+
                 case Assets.AAVE:
                     contractAddress = AssetContractAddresses.AAVE_BSC;
                     break;
+
                 case Assets.WBTC:
                     contractAddress = AssetContractAddresses.WBTC_BSC;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException("Asset is not supported on network");
             }
 
             return contractAddress;
         }
-
 
         private BigInteger ConvertMaxLossPercentage(double maxLossPercentage)
         {

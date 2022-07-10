@@ -32,8 +32,6 @@ namespace xendfinance_dotnet_sdk
             _gasEstimatorService = gasEstimatorService;
         }
 
-      
-
         public async Task<IEnumerable<EventLog<TEventMessage>>> GetEvents<TEventMessage>(Networks network, string contractAddress, ulong startBlock, ulong endBlock) where TEventMessage : IEventDTO, new()
         {
             BlockParameter startBlockParameter = new BlockParameter(startBlock);
@@ -62,25 +60,39 @@ namespace xendfinance_dotnet_sdk
             return blockTimeStamp;
         }
 
-        public async Task<string> SendTransactionAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, params object[] functionInput)
+        public async Task<string> SendTransactionAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, decimal? value, params object[] functionInput)
         {
             Contract contract = GetContract(network, contractAddress, abi);
             Account account = GetAccountInstance(network);
             var function = contract.GetFunction(functionName);
-            var gas = await function.EstimateGasAsync(functionInput);
+            HexBigInteger gas = await function.EstimateGasAsync(functionInput);
             HexBigInteger gasPrice = await GetGasPrice(network, gasPriceLevel);
-            string transactionHash = await function.SendTransactionAsync(account.Address, gas, gasPrice, null, functionInput);
+
+            HexBigInteger? valueInSIUnit = null;
+            if (value.HasValue)
+            {
+                valueInSIUnit = new HexBigInteger(BigInteger.Parse((value.Value * (decimal)Math.Pow(10, 18)).ToString()));
+            }
+
+            string transactionHash = await function.SendTransactionAsync(account.Address, gas, gasPrice, valueInSIUnit, functionInput);
             return transactionHash;
         }
 
-        public async Task<TransactionResponse> SendTransactionAndWaitForReceiptAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, CancellationToken cancellationToken, params object[] functionInput)
+        public async Task<TransactionResponse> SendTransactionAndWaitForReceiptAsync(Networks network, string contractAddress, string abi, string functionName, GasPriceLevel? gasPriceLevel, decimal? value, CancellationTokenSource cancellationTokenSource, params object[] functionInput)
         {
             Contract contract = GetContract(network, contractAddress, abi);
             Account account = GetAccountInstance(network);
             var function = contract.GetFunction(functionName);
-            var gas = await function.EstimateGasAsync(functionInput);
+            HexBigInteger gas = await function.EstimateGasAsync(functionInput);
             HexBigInteger gasPrice = await GetGasPrice(network, gasPriceLevel);
-            TransactionReceipt txReceipt = await function.SendTransactionAndWaitForReceiptAsync(account.Address, gas, gasPrice, null, cancellationToken, functionInput);
+            HexBigInteger? valueInSIUnit = null;
+
+            if (value.HasValue)
+            {
+                valueInSIUnit = new HexBigInteger(BigInteger.Parse((value.Value * (decimal)Math.Pow(10, 18)).ToString()));
+            }
+
+            TransactionReceipt txReceipt = await function.SendTransactionAndWaitForReceiptAsync(from: account.Address, gas: gas, gasPrice: gasPrice, value: valueInSIUnit, receiptRequestCancellationToken: cancellationTokenSource, functionInput: functionInput);
             bool isSuccessful = txReceipt.Status == new HexBigInteger(1);
             return new TransactionResponse
             {
@@ -124,11 +136,14 @@ namespace xendfinance_dotnet_sdk
             switch (gasPriceLevel.Value)
             {
                 case GasPriceLevel.Slow:
-                    return new HexBigInteger(new BigInteger( gasEstimateResponse.LowGas));
+                    return new HexBigInteger(new BigInteger(gasEstimateResponse.LowGas));
+
                 case GasPriceLevel.Average:
                     return new HexBigInteger(new BigInteger(gasEstimateResponse.AverageGas));
+
                 case GasPriceLevel.Fast:
                     return new HexBigInteger(new BigInteger(gasEstimateResponse.FastGas));
+
                 default:
                     throw new ArgumentOutOfRangeException("Unsupported Gas Price Level");
             }
@@ -148,8 +163,10 @@ namespace xendfinance_dotnet_sdk
             {
                 case Networks.BSC:
                     return _bscAccount;
+
                 case Networks.POLYGON:
                     return _polygonAccount;
+
                 default:
                     throw new ArgumentOutOfRangeException("Unsupported Network Chain");
             }
@@ -161,8 +178,10 @@ namespace xendfinance_dotnet_sdk
             {
                 case Networks.BSC:
                     return _bscWeb3;
+
                 case Networks.POLYGON:
                     return _polygonWeb3;
+
                 default:
                     throw new ArgumentOutOfRangeException("Unsupported Network Chain");
             }

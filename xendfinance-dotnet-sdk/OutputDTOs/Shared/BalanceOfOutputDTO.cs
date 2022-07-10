@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.Shared
         public virtual BigInteger Balance { get; set; }
     }
 
-    public partial class BalanceOfOutputDTO : BalanceOfOutputDTOBase { }
+    public partial class BalanceOfOutputDTO : BalanceOfOutputDTOBase
+    { }
 }

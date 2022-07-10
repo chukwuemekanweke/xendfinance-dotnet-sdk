@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.Shared
         public virtual BigInteger TotalSupply { get; set; }
     }
 
-    public partial class TotalSupplyOutputDTO : TotalSupplyOutputDTOBase { }
+    public partial class TotalSupplyOutputDTO : TotalSupplyOutputDTOBase
+    { }
 }

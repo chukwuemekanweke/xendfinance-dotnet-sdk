@@ -3,7 +3,8 @@ using Nethereum.Contracts;
 
 namespace xendfinance_dotnet_sdk.Functions
 {
-    public partial class BalanceOfFunction : BalanceOfFunctionBase { }
+    public partial class BalanceOfFunction : BalanceOfFunctionBase
+    { }
 
     [Function("balanceOf", "uint256")]
     public class BalanceOfFunctionBase : FunctionMessage

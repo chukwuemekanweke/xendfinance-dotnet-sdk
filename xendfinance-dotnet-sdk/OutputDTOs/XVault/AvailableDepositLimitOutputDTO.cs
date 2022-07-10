@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.XVault
         public virtual BigInteger DepositLimit { get; set; }
     }
 
-    public partial class AvailableDepositLimitOutputDTO : AvailableDepositLimitOutputDTOBase { }
+    public partial class AvailableDepositLimitOutputDTO : AvailableDepositLimitOutputDTOBase
+    { }
 }

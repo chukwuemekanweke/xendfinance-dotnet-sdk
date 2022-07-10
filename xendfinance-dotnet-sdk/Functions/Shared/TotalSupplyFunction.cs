@@ -3,11 +3,11 @@ using Nethereum.Contracts;
 
 namespace xendfinance_dotnet_sdk.Functions
 {
-    public partial class TotalSupplyFunction : TotalSupplyFunctionBase { }
+    public partial class TotalSupplyFunction : TotalSupplyFunctionBase
+    { }
 
     [Function("totalSupply", "uint256")]
     public class TotalSupplyFunctionBase : FunctionMessage
     {
-      
     }
 }

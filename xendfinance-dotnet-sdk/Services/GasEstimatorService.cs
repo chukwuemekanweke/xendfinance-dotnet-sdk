@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using xendfinance_dotnet_sdk.Interfaces;
 using xendfinance_dotnet_sdk.Models.Enums;
 using xendfinance_dotnet_sdk.Models.ServiceModels;
-using xendfinance_dotnet_sdk.Utilities;
 
 namespace xendfinance_dotnet_sdk.Services
 {
@@ -23,10 +22,7 @@ namespace xendfinance_dotnet_sdk.Services
             _polygonGasEstimateUrl = polygonGasEstimateUrl;
             _bscHttpClient = httpClientFactory.CreateClient("xendfinance-dotnet-sdk-gas-client-bsc");
             _polygonHttpClient = httpClientFactory.CreateClient("xendfinance-dotnet-sdk-gas-client-polygon");
-
         }
-
-
 
         /// <summary>
         /// Get's the estimated gas cost for a blockchain network
@@ -37,7 +33,6 @@ namespace xendfinance_dotnet_sdk.Services
         /// <exception cref="InvalidOperationException"></exception>
         public async Task<GasEstimateResponse> EstimateGas(Networks network)
         {
-
             GasEstimateResponse gasEstimate = GetFromInMemory(network);
             if (gasEstimate != null)
             {
@@ -49,9 +44,11 @@ namespace xendfinance_dotnet_sdk.Services
                 case Networks.BSC:
                     gasEstimate = await EstimateGasBSC();
                     break;
+
                 case Networks.POLYGON:
                     gasEstimate = await EstimateGasPolygon();
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException("Unsupported Network Chain");
             }

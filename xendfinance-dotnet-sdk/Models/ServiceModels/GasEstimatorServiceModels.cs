@@ -9,6 +9,7 @@
     }
 
     #region BSC Gas API Response
+
     internal class BSCGasEstimateResponse
     {
         public string Status { get; set; }
@@ -24,9 +25,11 @@
         public double FastGasPrice { get; set; }
         public decimal UsdPrice { get; set; }
     }
-    #endregion
+
+    #endregion BSC Gas API Response
 
     #region Polygon Gas API Response
+
     internal class PolygonGasEstimateResponse
     {
         public string Status { get; set; }
@@ -43,9 +46,11 @@
         public decimal BaseFee { get; set; }
         public decimal UsdPrice { get; set; }
     }
-    #endregion
+
+    #endregion Polygon Gas API Response
 
     #region Ethereum Gas API Response
+
     internal class EthereumGasEstimateResponse
     {
         public string Status { get; set; }
@@ -61,7 +66,8 @@
         public double FastGasPrice { get; set; }
         public decimal SuggestBaseFee { get; set; }
     }
-    #endregion
+
+    #endregion Ethereum Gas API Response
 
     #region HecoChain Gas API Response
 
@@ -78,9 +84,10 @@
         public int Low { get; set; }
     }
 
-    #endregion
+    #endregion HecoChain Gas API Response
 
     #region Avalanche Gas API Response
+
     internal class AvalancheGasAPIResponse
     {
         public string Status { get; set; }
@@ -98,6 +105,6 @@
         public double Fastgaspricegwei { get; set; }
         public double Standardgaspricegwei { get; set; }
     }
-    #endregion
 
+    #endregion Avalanche Gas API Response
 }

@@ -1,0 +1,13 @@
+﻿using Nethereum.ABI.FunctionEncoding.Attributes;
+using Nethereum.Contracts;
+
+namespace xendfinance_dotnet_sdk.Functions.XAuto
+{
+    public partial class BalanceFulcrumInTokenFunction : BalanceFulcrumInTokenFunctionBase
+    { }
+
+    [Function("balanceFulcrumInToken", "uint256")]
+    public class BalanceFulcrumInTokenFunctionBase : FunctionMessage
+    {
+    }
+}

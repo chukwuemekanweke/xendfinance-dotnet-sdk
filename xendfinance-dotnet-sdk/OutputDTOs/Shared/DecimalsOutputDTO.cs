@@ -10,5 +10,6 @@ namespace xendfinance_dotnet_sdk.OutputDTOs.Shared
         public virtual BigInteger Decimals { get; set; }
     }
 
-    public partial class DecimalsOutputDTO : DecimalsOutputDTOBase { }
+    public partial class DecimalsOutputDTO : DecimalsOutputDTOBase
+    { }
 }
