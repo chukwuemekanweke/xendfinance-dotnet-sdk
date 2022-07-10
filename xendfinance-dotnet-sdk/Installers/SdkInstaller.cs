@@ -2,6 +2,8 @@
 using xendfinance_dotnet_sdk.Interfaces;
 using xendfinance_dotnet_sdk.Models.Enums;
 using xendfinance_dotnet_sdk.Services;
+using xendfinance_dotnet_sdk.Services.XAuto;
+using xendfinance_dotnet_sdk.Services.XAuto.Interfaces;
 using xendfinance_dotnet_sdk.Utilities;
 
 namespace xendfinance_dotnet_sdk.Installers
@@ -71,6 +73,8 @@ namespace xendfinance_dotnet_sdk.Installers
                 return new GasEstimatorService(bscGasEstimateUrl, polygonGasEstimateUrl, httpClientFactory);
             });
             services.AddTransient<IXVaultConnectorService, XVaultConnectorService>();
+            services.AddTransient<IXAutoBSCConnectorService, XAutoBSCConnectorService>();
+            services.AddTransient<IXAutoPolygonConnectorService, XAutoPolygonConnectorService>();
         }
     }
 }
